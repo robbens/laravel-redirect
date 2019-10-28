@@ -2,10 +2,10 @@
 
 namespace Robbens\LaravelRedirect\Middleware;
 
-use App\Models\Redirect;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Robbens\LaravelRedirect\Models\Redirect;
 
 class RedirectsMissingPages
 {
@@ -41,11 +41,18 @@ class RedirectsMissingPages
     protected function getRedirectInfo(Request $request)
     {
         $uri = $request->path();
-        $uriWithQueryParams = trim($request->getRequestUri(), '/');
+        $uriWithQueryParams = $uri . '?' . $request->getQueryString();
 
         $redirect = Redirect::where('from', urldecode($uriWithQueryParams))
-            ->orWhere('from', urldecode($uri))
+            ->orWhere('from', $uriWithQueryParams)
             ->first();
+
+        if (!$redirect) {
+            // Check without querystring
+            $redirect = Redirect::where('from', urldecode($uri))
+                ->orWhere('from', $uri)
+                ->first();
+        }
 
         return $redirect;
     }
