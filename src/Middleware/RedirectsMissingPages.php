@@ -35,7 +35,9 @@ class RedirectsMissingPages
             return null;
         }
 
-        return redirect($redirect->to, $redirect->status ?? Response::HTTP_MOVED_PERMANENTLY);
+        $to = trim($redirect->to, '/');
+
+        return redirect($to, $redirect->status ?? Response::HTTP_MOVED_PERMANENTLY);
     }
 
     protected function getRedirectInfo(Request $request)
