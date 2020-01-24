@@ -28,12 +28,12 @@ class LaravelRedirectServiceProvider extends ServiceProvider
          * Optional methods to load your package assets
          */
 //         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        
-        $this->publishes([
-            __DIR__ . '/../config/redirects.php' => config_path('redirects.php'),
-        ], 'config');
 
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/redirects.php' => config_path('redirects.php'),
+            ], 'config');
+
             // Publish migrations
             if (! class_exists('CreateRedirectsTable')) {
                 $this->publishes([
