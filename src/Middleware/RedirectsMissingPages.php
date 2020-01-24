@@ -45,13 +45,15 @@ class RedirectsMissingPages
         $uri = $request->path();
         $uriWithQueryParams = $uri . '?' . $request->getQueryString();
 
-        $redirect = Redirect::where('from', urldecode($uriWithQueryParams))
+        $model = config('redirects.model');
+
+        $redirect = $model::where('from', urldecode($uriWithQueryParams))
             ->orWhere('from', $uriWithQueryParams)
             ->first();
 
         if (!$redirect) {
             // Check without querystring
-            $redirect = Redirect::where('from', urldecode($uri))
+            $redirect = $model::where('from', urldecode($uri))
                 ->orWhere('from', $uri)
                 ->first();
         }
