@@ -6,8 +6,8 @@ use Robbens\LaravelRedirect\Models\Redirect;
 
 class LaravelRedirect
 {
-    protected $fromUri;
-    protected $toUri;
+    protected string $fromUri;
+    protected string $toUri;
 
     public function from($uri)
     {
