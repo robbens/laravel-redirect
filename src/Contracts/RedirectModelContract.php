@@ -7,10 +7,10 @@ interface RedirectModelContract
     /**
      * @param string $value
      */
-    public function setFromAttribute($value);
+    public function setFromAttribute(string $value): void;
 
     /**
      * @param string $value
      */
-    public function setToAttribute($value);
+    public function setToAttribute(string $value): void;
 }
