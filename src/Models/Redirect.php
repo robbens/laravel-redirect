@@ -18,16 +18,23 @@ class Redirect extends Model implements RedirectModelContract
 
     public function setToAttribute(string $value): void
     {
-        $this->attributes['to'] = $this->cleanUrl($value);
+        $this->attributes['to'] = $this->cleanUrl($value, true);
     }
 
-    protected function cleanUrl(string $url): string
+    protected function cleanUrl(string $url, $allowAbsoluteUrl = false): string
     {
         $parts = parse_url($url);
+
         $queryString = isset($parts['query']) ? '?' . $parts['query'] : '';
         $fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
+        $path = $parts['path'] ?? '';
 
-        return trim($parts['path'], '/') . $queryString . $fragment;
+        $isAbsoluteUrl = $parts && isset($parts['host']);
+        if ($allowAbsoluteUrl && $isAbsoluteUrl) {
+            $path = $url;
+        }
+
+        return trim($path, '/') . $queryString . $fragment;
     }
 
     protected static function boot()

@@ -64,4 +64,28 @@ class RedirectTest extends TestCase
         $this->get('/contact-us')
             ->assertRedirect('/home#contact-us');
     }
+
+    /** @test */
+    public function it_can_redirect_to_absolute_url()
+    {
+        Redirect::create([
+            'from' => '/contact-us/',
+            'to' => 'https://google.com',
+        ]);
+
+        $this->get('/contact-us')
+            ->assertRedirect('https://google.com');
+    }
+
+    /** @test */
+    public function it_can_not_redirect_from_absolute_url()
+    {
+        Redirect::create([
+            'from' => 'https://google.com/foo',
+            'to' => '/contact-us',
+        ]);
+
+        $this->get('/foo')
+            ->assertRedirect('/contact-us');
+    }
 }
