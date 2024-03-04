@@ -15,6 +15,7 @@ class CreateTestingTables extends Migration
             $table->bigIncrements('id');
             $table->text('from');
             $table->text('to');
+            $table->boolean('regex')->default(false);
             $table->integer('status')->nullable();
             $table->timestamps();
         });

@@ -5,6 +5,7 @@ namespace Robbens\LaravelRedirect\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Robbens\LaravelRedirect\Models\RedirectRegex;
 use Robbens\LaravelRedirect\Models\Redirect;
 
 class RedirectsMissingPages
@@ -42,22 +43,51 @@ class RedirectsMissingPages
 
     protected function getRedirectInfo(Request $request)
     {
-        $uri = $request->path();
-        $uriWithQueryParams = $uri . '?' . $request->getQueryString();
+        $path = $request->path();
+        $uri = $path;
+
+        if ($queryString = $request->getQueryString()) {
+            $uri .= '?' . $queryString;
+        }
 
         $model = config('redirects.model');
 
-        $redirect = $model::where('from', urldecode($uriWithQueryParams))
-            ->orWhere('from', $uriWithQueryParams)
+        /**
+         * Check for redirects
+         */
+        $redirectModel = $model::where('from', urldecode($uri))
+            ->orWhere('from', $uri)
             ->first();
 
-        if (!$redirect) {
-            // Check without querystring
-            $redirect = $model::where('from', urldecode($uri))
-                ->orWhere('from', $uri)
+        /**
+         * Check for redirects with querystring
+         */
+        if (!$redirectModel) {
+            $redirectModel = $model::where('from', urldecode($path))
+                ->orWhere('from', $path)
                 ->first();
         }
 
-        return $redirect;
+        /**
+         * Check for wildcard redirects
+         */
+        if (!$redirectModel) {
+            $wildcardRedirects = $model::where('regex', true)->get();
+
+            $wildcardRedirects->each(function ($wildcardRedirect) use ($uri, &$redirectModel) {
+                $redirectRegex = new RedirectRegex($wildcardRedirect->from);
+
+                if ($redirectRegex->isMatch($uri)) {
+                    $redirectModel = $wildcardRedirect;
+                    $redirectModel->to = $redirectRegex->replace($redirectModel->to, $uri);
+
+                    return false;
+                }
+
+                return true;
+            });
+        }
+
+        return $redirectModel;
     }
 }

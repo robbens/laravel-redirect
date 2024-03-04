@@ -38,6 +38,7 @@ class LaravelRedirectServiceProvider extends ServiceProvider
             if (! class_exists('CreateRedirectsTable')) {
                 $this->publishes([
                     __DIR__ . '/../database/migrations/create_redirects_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_redirects_table.php'),
+                    __DIR__ . '/../database/migrations/add_regex_to_redirects_table.php.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_add_regex_to_redirects_table.php'),
                     // you can add any number of migrations here
                 ], 'migrations');
             }
